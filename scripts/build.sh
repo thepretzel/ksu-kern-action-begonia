@@ -20,6 +20,21 @@ DEFCONFIG_PATH="${KERNEL_DIR}/arch/${ARCH}/configs/${KERNEL_CONFIG}"
 
 prepare_defconfig() {
 	group "Preparing defconfig"
+	
+    local patch_dir patch
+	patch_dir="$(dirname "${BASH_SOURCE[0]}")/../local-patches"
+	if [ -d "$patch_dir" ]; then
+		for patch in "$patch_dir"/*.patch; do
+			[ -f "$patch" ] || continue
+			if git -C "$KERNEL_DIR" apply --check "$patch" 2>/dev/null; then
+				git -C "$KERNEL_DIR" apply "$patch"
+				info "applied local patch: $(basename "$patch")"
+			else
+				warn "skipping local patch (doesn't apply): $(basename "$patch")"
+			fi
+		done
+	fi
+	
 	[ -f "$DEFCONFIG_PATH" ] \
 		|| die "defconfig not found: arch/${ARCH}/configs/${KERNEL_CONFIG}
        Available: $(ls "${KERNEL_DIR}/arch/${ARCH}/configs/" | head -20 | tr '\n' ' ')"
@@ -93,6 +108,7 @@ prepare_defconfig() {
 
 make_args() {
 	printf '%s' "O=out ARCH=${ARCH}"
+	printf ' V=1'
 	[ -n "${CUSTOM_CMDS:-}" ] && printf ' %s' "$CUSTOM_CMDS"
 	[ -n "${EXTRA_CMDS:-}"  ] && printf ' %s' "$EXTRA_CMDS"
 	[ -n "${GCC_64:-}"      ] && printf ' %s' "$GCC_64"

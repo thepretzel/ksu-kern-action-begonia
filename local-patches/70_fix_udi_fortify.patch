@@ -1,6 +1,6 @@
 --- a/drivers/misc/mediatek/base/power/udi_v2/mtk_udi.c
 +++ b/drivers/misc/mediatek/base/power/udi_v2/mtk_udi.c
-@@ -475,14 +475,14 @@ static ssize_t udi_jtag_clock_proc_write(struct file *file,
+@@ -253,7 +253,7 @@ static ssize_t udi_jtag_clock_proc_write(struct file *file,
  	memset(DR_byte, 0, sizeof(DR_byte));
  
  	/* input check format */
@@ -9,6 +9,7 @@
  			&recv_key_word[0], &recv_buf[0],
  			&recv_buf[1], recv_char[0], &recv_buf[3],
  			&recv_buf[2], recv_char[1], &recv_buf[4]) == 8) {
+@@ -261,7 +261,7 @@ static ssize_t udi_jtag_clock_proc_write(struct file *file,
  		/* 6 parameter */
  		IR_pause_count = recv_buf[3];
  		DR_pause_count = recv_buf[4];
